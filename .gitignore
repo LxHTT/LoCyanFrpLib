@@ -1,0 +1,7 @@
+.idea/**
+.vs/**
+.vscode/**
+venv/**
+__pycache__/**
+LCFLib/__pycache__/**
+1.py
