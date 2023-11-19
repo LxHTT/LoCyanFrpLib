@@ -4,4 +4,6 @@
 venv/**
 __pycache__/**
 LCFLib/__pycache__/**
+LCFLib/v1/__pycache__/**
+LCFLib/v2/__pycache__/**
 1.py
