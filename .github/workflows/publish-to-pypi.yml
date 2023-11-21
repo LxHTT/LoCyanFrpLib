@@ -3,162 +3,59 @@ name: Publish to PyPI
 on: workflow_dispatch
 
 jobs:
-  py36:
-    name: Publish Python package to PyPI
+
+  build-and-publish:
+
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        lcflib-version: ["1.0.0"]
 
     steps:
     - name: Check out the Repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     
     - name: Set up Python Environment
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.8'
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel twine
+        pip install setuptools wheel requests twine
 
-    - name: Build and Publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+    - name: Build
       run: |
         python setup.py sdist bdist_wheel
-        twine upload dist/*
- 
-  py37:
-    name: Publish Python package to PyPI
-    runs-on: ubuntu-latest
 
-    steps:
-    - name: Check out the Repository
-      uses: actions/checkout@v2
-    
-    - name: Set up Python Environment
-      uses: actions/setup-python@v2
+    - name: Rename file
+      run: |
+        mv dist/*.whl dist/LoCyanFrpLib-${{ matrix.lcflib-version }}-py${{ matrix.python-version }}-none-any.whl
+  
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
       with:
-        python-version: '3.8'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-
-    - name: Build and Publish
+        name: Python${{ matrix.python-version }}-LoCyanFrpLib${{ matrix.lcflib-version }}
+        path: dist/
+  
+    - name: Publish
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
-       
-  py38:
-    name: Publish Python package to PyPI
-    runs-on: ubuntu-latest
+        twine upload dist/*.whl
 
-    steps:
-    - name: Check out the Repository
-      uses: actions/checkout@v2
-    
-    - name: Set up Python Environment
-      uses: actions/setup-python@v2
+    - name: Release
+      uses: softprops/action-gh-release@v1
       with:
-        python-version: '3.8'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    
-    # 构建和发布
-    - name: Build and Publish
+        body_path: ./ChangeLog.md
+        prerelease: false
+        draft: false
+        tag_name: v${{ matrix.lcflib-version }}
+        files: |
+          dist/*.whl
       env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
-
-  py39:
-    name: Publish Python package to PyPI
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Check out the Repository
-      uses: actions/checkout@v2
-    
-    - name: Set up Python Environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    
-    # 构建和发布
-    - name: Build and Publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
-
-  py310:
-    name: Publish Python package to PyPI
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Check out the Repository
-      uses: actions/checkout@v2
-    
-    - name: Set up Python Environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    
-    # 构建和发布
-    - name: Build and Publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
-
-  py311:
-    name: Publish Python package to PyPI
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Check out the Repository
-      uses: actions/checkout@v2
-    
-    - name: Set up Python Environment
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install setuptools wheel twine
-    
-    # 构建和发布
-    - name: Build and Publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
-        python setup.py sdist bdist_wheel
-        twine upload dist/*
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
