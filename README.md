@@ -6,7 +6,7 @@
 ### 安装
 ___
 ```command
-pip install LoCyanFrpLib
+pip install LCFLib
 ```
 
 ### 开始使用  
