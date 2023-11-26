@@ -11,7 +11,6 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.7", "3.8", "3.9", "3.10"]
-        lcflib-version: ["1.0.0"]
 
     steps:
     - name: Check out the Repository
@@ -27,18 +26,25 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel requests twine
 
+    - name: Set Environment Variable
+      run: |
+        cd repo
+        lcflib_version=$(python -c " import LCFLib; print(LCFLib.__version__)")
+        echo "LCFLIB_VERSION=lcflib_version" >> $GITHUB_ENV
+        cd ..
+
     - name: Build
       run: |
         python setup.py sdist bdist_wheel
 
     - name: Rename file
       run: |
-        mv dist/*.whl dist/LoCyanFrpLib-${{ matrix.lcflib-version }}-py${{ matrix.python-version }}-none-any.whl
+        mv dist/*.whl dist/LoCyanFrpLib-${{ env.LCFLIB_VERSION }}-py${{ matrix.python-version }}-none-any.whl
   
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: Python${{ matrix.python-version }}-LoCyanFrpLib${{ matrix.lcflib-version }}
+        name: Python${{ matrix.python-version }}-LoCyanFrpLib${{ env.LCFLIB_VERSION }}
         path: dist/
   
     - name: Publish
@@ -54,7 +60,7 @@ jobs:
         body_path: ./ChangeLog.md
         prerelease: false
         draft: false
-        tag_name: v${{ matrix.lcflib-version }}
+        tag_name: v${{ env.LCFLIB_VERSION }}
         files: |
           dist/*.whl
       env:
