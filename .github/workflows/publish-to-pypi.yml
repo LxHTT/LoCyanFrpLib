@@ -28,7 +28,7 @@ jobs:
 
     - name: Set Environment Variable
       run: |
-        lcflib_version=$(python -c " import LCFLib; print(LCFLib.__version__)")
+        lcflib_version=$(python -c "import LCFLib; print(LCFLib.__version__)")
         echo "LCFLIB_VERSION=lcflib_version" >> $GITHUB_ENV
 
     - name: Build
