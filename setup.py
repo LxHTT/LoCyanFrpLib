@@ -4,7 +4,7 @@ with open('README.md', encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name="LCFLib",
+    name="LoCyanFrpLib",
     version=LCFLib.__version__,
     author="LxHTT",
     author_email="lxhtt@vip.qq.com",
